@@ -12,3 +12,9 @@ spring:
     properties:
       hibernate:
         format_sql: true
+  jwt:
+    secret: SGVsbG9UaGlzSXNBQmFzZTY0RW5jb2RlZFNlY3JldEtleQ==
+    token:
+      expirationMs:
+        hour: 3600000
+        day: 86400000

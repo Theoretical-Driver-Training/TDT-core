@@ -1,6 +1,6 @@
-package com.example.webapi.repository.user;
+package com.example.api.repository.user;
 
-import com.example.webapi.model.user.User;
+import com.example.api.model.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

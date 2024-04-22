@@ -1,6 +1,6 @@
-package com.example.webapi.service.user;
+package com.example.api.service.user;
 
-import com.example.webapi.model.user.User;
+import com.example.api.model.user.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;

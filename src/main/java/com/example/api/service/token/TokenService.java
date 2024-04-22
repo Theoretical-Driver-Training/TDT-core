@@ -4,7 +4,10 @@ import com.example.api.model.token.Token;
 import com.example.api.repository.token.TokenRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
+import java.util.Date;
 
 @Service
 public class TokenService {
@@ -21,7 +24,7 @@ public class TokenService {
         logger.info("Saving a token");
         Token tokenEntity = repository.findByUsername(username)
                 .orElseGet(() -> {
-                    Token newToken = new Token(username, token);
+                    Token newToken = new Token(token, username);
                     repository.save(newToken);
                     logger.info("New token created");
                     return newToken;
@@ -29,5 +32,13 @@ public class TokenService {
         tokenEntity.setToken(token);
         repository.save(tokenEntity);
         logger.info("Token {} saved", token);
+    }
+
+    public boolean isValidBearerToken(String bearerToken) {
+        return bearerToken != null && bearerToken.startsWith("Bearer ");
+    }
+
+    public String extractToken(String bearerToken) {
+        return bearerToken.substring(7);
     }
 }

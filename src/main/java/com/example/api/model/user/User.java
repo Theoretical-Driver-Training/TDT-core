@@ -1,4 +1,4 @@
-package com.example.webapi.model.user;
+package com.example.api.model.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;

@@ -1,7 +1,7 @@
-package com.example.webapi.service.user;
+package com.example.api.service.user;
 
-import com.example.webapi.model.user.User;
-import com.example.webapi.repository.user.UserRepository;
+import com.example.api.model.user.User;
+import com.example.api.repository.user.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

@@ -1,6 +1,7 @@
 package com.example.api.security.jwt;
 
-import com.example.api.repository.token.BlacklistTokenRepository;
+
+import com.example.api.service.token.BlacklistTokenService;
 import com.example.api.service.user.UserDetailsImpl;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
@@ -20,14 +21,15 @@ public class JwtUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
 
-    @Autowired
-    private BlacklistTokenRepository blacklistTokenRepository;
 
     @Value("${spring.jwt.secret}")
     private String jwtSecret;
 
     @Value("${spring.jwt.token.expirationMs.day}")
     private int EXPIRATION;
+
+    @Autowired
+    private BlacklistTokenService blacklistTokenService;
 
     private Key getSigningKey() {
         return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
@@ -58,7 +60,7 @@ public class JwtUtils {
     }
 
     public boolean isTokenInBlacklist(String token) {
-        return blacklistTokenRepository.existsByToken(token);
+        return blacklistTokenService.exists(token);
     }
 
     private boolean validateToken(String token) {

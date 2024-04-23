@@ -21,10 +21,6 @@ public class JwtUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
 
-
-    @Autowired
-    private BlacklistTokenRepository blacklistTokenRepository;
-
     @Value("${spring.jwt.secret}")
     private String jwtSecret;
 

@@ -29,6 +29,7 @@ public class AuthService {
     @Autowired
     private PasswordEncoder encoder;
 
+
     @Autowired
     private TokenService tokenService;
 

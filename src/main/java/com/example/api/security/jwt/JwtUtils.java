@@ -1,6 +1,5 @@
 package com.example.api.security.jwt;
 
-
 import com.example.api.service.token.BlacklistTokenService;
 import com.example.api.service.user.UserDetailsImpl;
 import io.jsonwebtoken.*;

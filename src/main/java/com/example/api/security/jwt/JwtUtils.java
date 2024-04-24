@@ -20,10 +20,10 @@ public class JwtUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
 
-    @Value("${spring.jwt.secret}")
+    @Value(value = "${spring.jwt.secret}")
     private String jwtSecret;
 
-    @Value("${spring.jwt.token.expirationMs.day}")
+    @Value(value = "${spring.jwt.token.expirationMs.day}")
     private int EXPIRATION;
 
     @Autowired

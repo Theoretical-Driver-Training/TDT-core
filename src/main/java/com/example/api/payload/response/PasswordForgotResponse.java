@@ -13,7 +13,7 @@ public class PasswordForgotResponse {
     private String content;
 
     public PasswordForgotResponse(PasswordChangeToken resetToken) {
-        activationLink = "https://localhost:8080/api/auth/forgot_password?token=" + resetToken.getToken();
+        activationLink = "https://localhost:8080/api/profile/forgot_password?token=" + resetToken.getToken();
 
         subject = "Активация нового пароля";
         content = "<html><body>"

@@ -1,7 +1,7 @@
 package com.example.api.controller;
 
 import com.example.api.payload.request.ProfileRequest;
-import com.example.api.service.user.ProfileService;
+import com.example.api.service.profile.ProfileService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;

@@ -2,7 +2,7 @@ package com.example.api.controller;
 
 import com.example.api.payload.request.PasswordChangeRequest;
 import com.example.api.payload.request.PasswordForgotRequest;
-import com.example.api.service.ProfilePasswordService;
+import com.example.api.service.profile.ProfilePasswordService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -33,10 +33,4 @@ public class ProfilePasswordController {
     public ResponseEntity<?> forgotPassword(@RequestBody PasswordForgotRequest request) {
         return service.forgotPassword(request.getUsername());
     }
-
-    @PostMapping("/validate")
-    public ResponseEntity<?> validatePassword(@RequestHeader("Authorization") String passwordChangeToken, @RequestBody PasswordChangeRequest request) {
-        return service.validateCurrentPassword(passwordChangeToken, request.getOldPassword(), request.getNewPassword());
-    }
-
 }

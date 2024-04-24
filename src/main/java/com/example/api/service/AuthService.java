@@ -68,6 +68,7 @@ public class AuthService {
         String token = jwtUtils.generateJwtToken(authentication);
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
+
         tokenService.storeToken(username, token);
         logger.info("User {} authenticated successfully", username);
         return ResponseEntity.ok().body(new AuthResponse(token, userDetails.getUsername(), userDetails.getAuthorities()));

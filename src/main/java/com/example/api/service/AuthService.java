@@ -29,7 +29,6 @@ public class AuthService {
     @Autowired
     private PasswordEncoder encoder;
 
-
     @Autowired
     private TokenService tokenService;
 
@@ -69,7 +68,8 @@ public class AuthService {
         String token = jwtUtils.generateJwtToken(authentication);
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
-        tokenService.storeToken(username, userDetails.getUsername());
+
+        tokenService.storeToken(username, token);
         logger.info("User {} authenticated successfully", username);
         return ResponseEntity.ok().body(new AuthResponse(token, userDetails.getUsername(), userDetails.getAuthorities()));
     }
@@ -80,9 +80,18 @@ public class AuthService {
 
     public ResponseEntity<?> logoutUser(String bearerToken) {
         logger.info("Logout user {}", bearerToken);
+        if (!tokenService.isValidBearerToken(bearerToken)) {
+            logger.error("Bearer token is invalid");
+            return ResponseEntity.badRequest().body("Bearer token is invalid");
+        }
 
-        blacklistTokenService.addToken(bearerToken);
+        String token = tokenService.extractToken(bearerToken);
+        if (jwtUtils.isTokenInBlacklist(bearerToken)) {
+            logger.error("User token is in list of blacklist");
+            return ResponseEntity.badRequest().body("User token is in list of blacklist");
+        }
 
+        blacklistTokenService.saveToken(token);
         logger.info("User {} logged out successfully", bearerToken);
         return ResponseEntity.ok().body("User logged out successfully");
     }

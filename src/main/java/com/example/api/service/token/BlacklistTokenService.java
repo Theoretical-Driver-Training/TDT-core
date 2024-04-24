@@ -19,7 +19,7 @@ public class BlacklistTokenService {
         this.repository = repository;
     }
 
-    public void addToken(String token) {
+    public void saveToken(String token) {
         logger.info("Adding user token to blacklist");
         BlacklistToken blacklistToken = new BlacklistToken();
         blacklistToken.setToken(token);

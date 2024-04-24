@@ -90,7 +90,7 @@ public class AuthService {
             return ResponseEntity.badRequest().body("Bearer token is invalid");
         }
 
-        String token = tokenService.extractToken(bearerToken);
+        String token = tokenService.extractBearerToken(bearerToken);
         if (jwtUtils.isTokenInBlacklist(token)) {
             logger.error("User token is in list of blacklist");
             return ResponseEntity.badRequest().body("User token is in list of blacklist");

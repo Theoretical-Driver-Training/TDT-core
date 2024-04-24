@@ -1,9 +1,10 @@
-package com.example.api.service.user;
+package com.example.api.service.profile;
 
 import com.example.api.model.user.User;
 import com.example.api.payload.response.ProfileResponse;
 import com.example.api.security.jwt.JwtUtils;
 import com.example.api.service.token.TokenService;
+import com.example.api.service.user.UserDetailsServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -37,7 +38,7 @@ public class ProfileService {
             return ResponseEntity.badRequest().body("Bearer token expired");
         }
 
-        String token = tokenService.extractToken(bearerToken);
+        String token = tokenService.extractBearerToken(bearerToken);
         if (jwtUtils.isTokenInBlacklist(token)) {
             logger.error("User token is in list of blacklist");
             return ResponseEntity.badRequest().body("User token is in list of blacklist");
@@ -70,7 +71,7 @@ public class ProfileService {
             return ResponseEntity.badRequest().body("Bearer token expired");
         }
 
-        String token = tokenService.extractToken(bearerToken);
+        String token = tokenService.extractBearerToken(bearerToken);
         if (jwtUtils.isTokenInBlacklist(token)) {
             logger.error("User token is in list of blacklist");
             return ResponseEntity.badRequest().body("User token is in list of blacklist");
@@ -90,4 +91,5 @@ public class ProfileService {
         logger.info("Get profile response");
         return ResponseEntity.ok().body(profileResponse);
     }
+
 }

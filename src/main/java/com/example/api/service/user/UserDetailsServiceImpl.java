@@ -1,5 +1,6 @@
 package com.example.api.service.user;
 
+import com.example.api.model.user.Role;
 import com.example.api.model.user.User;
 import com.example.api.repository.user.UserRepository;
 import org.slf4j.Logger;
@@ -31,6 +32,17 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         repository.save(user);
     }
 
+    public void createUser(String username, String password, Date date, Role role) {
+        logger.info("Creating user {}", username);
+        User user = new User();
+        user.setUsername(username);
+        user.setPassword(encoder.encode(password));
+        user.setLastPasswordChangeDate(date);
+        user.setRole(role);
+        repository.save(user);
+        logger.info("User created: {}", username);
+    }
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = repository.findByUsername(username)
@@ -54,8 +66,14 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         return repository.findByUsername(username);
     }
 
-    public boolean existsByUsername(String username) {
-        return repository.existsByUsername(username);
+    public boolean existUserByUsername(String username) {
+        logger.info("Checking if user {} exists", username);
+        if (repository.findByUsername(username).isEmpty()) {
+            logger.error("User {} does not exist", username);
+            return false;
+        }
+        logger.info("User {} exists", username);
+        return true;
     }
 
     public boolean isUserIsEmpty(Optional<?> optional) {

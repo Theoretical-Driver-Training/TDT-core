@@ -2,13 +2,16 @@ package com.example.api.service;
 
 import com.example.api.model.token.PasswordChangeToken;
 import com.example.api.model.user.User;
+import com.example.api.payload.request.PasswordForgotRequest;
 import com.example.api.payload.response.PasswordChangeResponse;
+import com.example.api.payload.response.PasswordForgotResponse;
 import com.example.api.security.jwt.JwtUtils;
 import com.example.api.service.mail.MailService;
 import com.example.api.service.token.BlacklistTokenService;
 import com.example.api.service.token.PasswordChangeTokenService;
 import com.example.api.service.token.TokenService;
 import com.example.api.service.user.UserDetailsServiceImpl;
+import jakarta.validation.constraints.NotBlank;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -107,6 +110,25 @@ public class ProfilePasswordService {
         return ResponseEntity.ok().body("Password changed successfully");
     }
 
+
+
+    public ResponseEntity<?> forgotPassword(String username) {
+        logger.info("Forgot password request received");
+        Optional<User> userOptional = userDetailsService.getUserByUsername(username);
+        if (validateUserIsEmpty(userOptional)) {
+            return ResponseEntity.badRequest().body("User not found");
+        }
+
+        User user = userOptional.get();
+
+        PasswordChangeToken changeToken = changePasswordTokenService.getOnCreateChangePasswordToken(user);
+        PasswordForgotResponse forgotResponse = new PasswordForgotResponse(changeToken);
+        mailService.sendMail(user.getUsername(), forgotResponse.getSubject(), forgotResponse.getContent());
+
+        logger.info("Forgot password request completed");
+        return ResponseEntity.ok().body("Password forgot successfully");
+    }
+
     public ResponseEntity<?> validateCurrentPassword(String bearerToken, String currentPassword, String newPassword) {
         logger.info("Validating password");
         if (validateBearerToken(bearerToken)) {
@@ -190,5 +212,4 @@ public class ProfilePasswordService {
         }
         return false;
     }
-
 }

@@ -1,6 +1,7 @@
 package com.example.api.controller;
 
 import com.example.api.payload.request.PasswordChangeRequest;
+import com.example.api.payload.request.PasswordForgotRequest;
 import com.example.api.service.ProfilePasswordService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,6 +19,7 @@ public class ProfilePasswordController {
     }
 
     @PostMapping("/reset")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> resetPassword(@RequestHeader("Authorization") String bearerToken) {
         return service.resetPassword(bearerToken);
     }
@@ -25,6 +27,11 @@ public class ProfilePasswordController {
     @PostMapping("/change")
     public ResponseEntity<?> changePassword(@RequestHeader("Authorization") String passwordChangeToken, @RequestBody PasswordChangeRequest request) {
         return service.changePassword(passwordChangeToken, request.getOldPassword(), request.getNewPassword());
+    }
+
+    @PostMapping("/forgot")
+    public ResponseEntity<?> forgotPassword(@RequestBody PasswordForgotRequest request) {
+        return service.forgotPassword(request.getUsername());
     }
 
     @PostMapping("/validate")

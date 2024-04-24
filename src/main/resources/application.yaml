@@ -18,3 +18,6 @@ spring:
       expirationMs:
         hour: 3600000
         day: 86400000
+  mail:
+    username: theoreticaldrivertraining@gmail.com
+    password: yyph oqww gzfp tdqx

@@ -7,6 +7,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -33,6 +34,14 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                     return new UsernameNotFoundException("User not found with username: " + username);
                 });
         return new UserDetailsImpl(user);
+    }
+
+    public Optional<User> getUserByUsername(String username) {
+        return repository.findByUsername(username);
+    }
+
+    public Optional<User> getUserById(Long id) {
+        return repository.findById(id);
     }
 
     public boolean existsByUsername(String username) {

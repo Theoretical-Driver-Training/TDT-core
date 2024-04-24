@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -21,6 +23,18 @@ public class User {
 
     @JsonIgnore
     private String password;
+
+    private Date lastPasswordChangeDate;
+
+    private String lastName;
+    private String firstName;
+    private String middleName;
+
+    private double weight;
+    private double height;
+
+    @Temporal(TemporalType.DATE)
+    private Date birthDate;
 
     @Enumerated(EnumType.STRING)
     private Role role;

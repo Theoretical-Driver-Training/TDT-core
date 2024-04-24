@@ -32,7 +32,7 @@ public class TokenService {
     }
 
     public boolean isValidBearerToken(String bearerToken) {
-        return bearerToken != null && bearerToken.startsWith("Bearer ");
+        return bearerToken == null || !bearerToken.startsWith("Bearer ");
     }
 
     public String extractToken(String bearerToken) {

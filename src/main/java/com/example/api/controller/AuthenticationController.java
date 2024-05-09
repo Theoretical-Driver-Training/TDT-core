@@ -1,7 +1,7 @@
 package com.example.api.controller;
 
 import com.example.api.payload.request.AuthRequest;
-import com.example.api.service.AuthService;
+import com.example.api.service.user.UserAuthenticationService;
 import com.example.api.service.user.UserRegistrationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 public class AuthenticationController {
 
     @Autowired
-    private AuthService authService;
+    private UserAuthenticationService authService;
 
     @Autowired
     private UserRegistrationService userRegistrationService;
@@ -33,8 +33,8 @@ public class AuthenticationController {
         return authService.authenticateUser(username, password);
     }
 
-    @PostMapping("/logout")
     @PreAuthorize("isAuthenticated()")
+    @PostMapping("/logout")
     public ResponseEntity<?> logoutUser(@RequestHeader("Authorization") String bearerToken) {
         return authService.logoutUser(bearerToken);
     }

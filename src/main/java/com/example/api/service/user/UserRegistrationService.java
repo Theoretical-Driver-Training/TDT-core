@@ -21,14 +21,11 @@ public class UserRegistrationService {
     @Transactional
     public ResponseEntity<?> registerUser(String username, String password) {
         log.info("Registering user {}", username);
-
         if (userExists(username)) {
             return handleUserAlreadyExistsError(username);
         }
-
         createNewUser(username, password);
         sendSignupMailAsync(username);
-
         return buildSuccessResponse(username);
     }
 

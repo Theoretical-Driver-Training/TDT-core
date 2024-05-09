@@ -2,6 +2,7 @@ package com.example.api.controller;
 
 import com.example.api.payload.request.AuthRequest;
 import com.example.api.service.AuthService;
+import com.example.api.service.user.UserRegistrationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -15,11 +16,14 @@ public class AuthenticationController {
     @Autowired
     private AuthService authService;
 
+    @Autowired
+    private UserRegistrationService userRegistrationService;
+
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@RequestBody AuthRequest request) {
         String username = request.getUsername();
         String password = request.getPassword();
-        return authService.registerUser(username, password);
+        return userRegistrationService.registerUser(username, password);
     }
 
     @PostMapping("/signin")

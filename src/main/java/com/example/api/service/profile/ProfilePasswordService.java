@@ -9,8 +9,7 @@ import com.example.api.service.token.BlacklistTokenService;
 import com.example.api.service.token.PasswordChangeTokenService;
 import com.example.api.service.token.TokenService;
 import com.example.api.service.user.UserDetailsServiceImpl;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -18,9 +17,8 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 @Service
+@Slf4j
 public class ProfilePasswordService {
-
-    private final Logger logger = LoggerFactory.getLogger(ProfilePasswordService.class);
 
     @Autowired
     private TokenService tokenService;
@@ -38,7 +36,7 @@ public class ProfilePasswordService {
     private MailService mailService;
 
     public ResponseEntity<?> resetPassword(String bearerToken) {
-        logger.info("Change password request received");
+        log.info("Change password request received");
         if (!tokenService.isValidBearerToken(bearerToken)) {
             return ResponseEntity.badRequest().body("Invalid bearer token");
         }
@@ -49,24 +47,19 @@ public class ProfilePasswordService {
         }
 
         String username = tokenService.getUserNameFromJwtToken(token);
-        Optional<User> userOptional = userDetailsService.getUserByUsername(username);
-        if (userDetailsService.isUserIsEmpty(userOptional)) {
-            return ResponseEntity.badRequest().body("User not found");
-        }
-
-        User user = userOptional.get();
+        User user = userDetailsService.getUserEntityByUsername(username);
 
         PasswordChangeToken passwordChangeToken = passwordChangeTokenService.getOnCreateChangePasswordToken(user);
         PasswordChangeResponse passwordChangeResponse = new PasswordChangeResponse(passwordChangeToken);
 
         mailService.sendMail(user.getUsername(), passwordChangeResponse.getSubject(), passwordChangeResponse.getContent());
 
-        logger.info("Password change request completed");
+        log.info("Password change request completed");
         return ResponseEntity.ok().body("Password change request completed");
     }
 
     public ResponseEntity<?> changePassword(String changeToken, String oldPassword, String newPassword) {
-        logger.info("Changing password");
+        log.info("Changing password");
         if (!passwordChangeTokenService.isValidChangeToken(changeToken)) {
             return ResponseEntity.badRequest().body("Invalid bearer token");
         }
@@ -93,25 +86,20 @@ public class ProfilePasswordService {
 
         blacklistTokenService.saveToken(token);
 
-        logger.info("Password changed successfully");
+        log.info("Password changed successfully");
         return ResponseEntity.ok().body("Password changed successfully");
     }
 
     public ResponseEntity<?> forgotPassword(String username) {
-        logger.info("Forgot password request received");
-        Optional<User> userOptional = userDetailsService.getUserByUsername(username);
-        if (userDetailsService.isUserIsEmpty(userOptional)) {
-            return ResponseEntity.badRequest().body("User not found");
-        }
-
-        User user = userOptional.get();
+        log.info("Forgot password request received");
+        User user = userDetailsService.getUserEntityByUsername(username);
 
         PasswordChangeToken passwordChangeToken = passwordChangeTokenService.getOnCreateChangePasswordToken(user);
         PasswordForgotResponse passwordForgotResponse = new PasswordForgotResponse(passwordChangeToken);
 
         mailService.sendMail(user.getUsername(), passwordForgotResponse.getSubject(), passwordForgotResponse.getContent());
 
-        logger.info("Forgot password request completed");
+        log.info("Forgot password request completed");
         return ResponseEntity.ok().body("Password forgot successfully");
     }
 }

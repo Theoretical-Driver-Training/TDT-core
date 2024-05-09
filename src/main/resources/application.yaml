@@ -19,5 +19,14 @@ spring:
         hour: 3600000
         day: 86400000
   mail:
-    username: theoreticaldrivertraining@gmail.com
+    user: theoreticaldrivertraining@gmail.com
     password: yyph oqww gzfp tdqx
+    host: smtp.gmail.com
+    port: 587
+    transport:
+      protocol: smtp
+    smtp:
+      auth: true
+      starttls:
+        enable: true
+        required: true

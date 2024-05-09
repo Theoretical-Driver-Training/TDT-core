@@ -9,6 +9,5 @@ import lombok.Getter;
 @Table(name = "test status")
 public enum TestStatus {
     COMPLETED,
-    IN_PROGRESS;
-
+    IN_PROGRESS
 }

@@ -5,13 +5,13 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class SignupResponse {
+public class SignupMailResponse {
 
     String subject;
 
     String content;
 
-    public SignupResponse() {
+    public SignupMailResponse() {
         subject = "Добро пожаловать в систему!";
         content = "<html><body>"
                 + "<p style='font-family: Arial, sans-serif;'>Добро пожаловать в систему оценки функциональной готовности водителей автотранспорта!</p>"

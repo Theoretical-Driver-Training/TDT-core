@@ -70,9 +70,6 @@ public class ProfilePasswordService {
         }
 
         Optional<PasswordChangeToken> changeTokenOptional = passwordChangeTokenService.getByToken(token);
-        if (userDetailsService.isUserIsEmpty(changeTokenOptional)) {
-            return ResponseEntity.badRequest().body("User not found");
-        }
 
         User user = changeTokenOptional.get().getUser();
         if (!userDetailsService.isValidOldPassword(user, oldPassword)) {

@@ -26,7 +26,7 @@ public class PossibleResult {
     @Column(nullable = false)
     private int endValue;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
 }

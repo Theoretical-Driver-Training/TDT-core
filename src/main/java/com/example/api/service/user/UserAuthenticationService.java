@@ -1,6 +1,5 @@
 package com.example.api.service.user;
 
-import com.example.api.model.user.User;
 import com.example.api.payload.response.AuthResponse;
 import com.example.api.security.jwt.JwtUtils;
 import com.example.api.service.token.BlacklistTokenService;
@@ -72,22 +71,24 @@ public class UserAuthenticationService {
         return ResponseEntity.ok().body("User logged out successfully");
     }
 
-    public User getUserAuthenticated(String bearerToken) {
+    public ResponseEntity<?> validateUserAuthenticationBearerToken(String bearerToken) {
         String token = validateAndExtractToken(bearerToken);
-        if (token == null) return null;
-
-        String username = tokenService.getUserNameFromJwtToken(token);
-        if (username == null) {
-            log.warn("JWT Token does not contain a valid username");
-            return null;
+        if (token == null) {
+            String errorMsg = "Bearer token is invalid";
+            log.error(errorMsg);
+            return ResponseEntity.badRequest().body(errorMsg);
         }
 
-        User user = userDetailsService.getUserEntityByUsername(username);
-        if (user == null) {
-            log.warn("User {} not found", username);
+        String username = getUsernameFromJwtToken(token);
+        UserDetailsImpl userDetails = getUserDetailsFromSecurityContext();
+
+        if (!userDetails.getUsername().equals(username)) {
+            String errorMsg = "User is not authenticated";
+            log.error(errorMsg);
+            return ResponseEntity.badRequest().body(errorMsg);
         }
 
-        return user;
+        return ResponseEntity.ok().build();
     }
 
     private String validateAndExtractToken(String bearerToken) {
@@ -103,5 +104,13 @@ public class UserAuthenticationService {
         }
 
         return token;
+    }
+
+    private String getUsernameFromJwtToken(String token) {
+        return tokenService.getUserNameFromJwtToken(token);
+    }
+
+    public UserDetailsImpl getUserDetailsFromSecurityContext() {
+        return (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 }

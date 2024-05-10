@@ -24,7 +24,7 @@ public class PossibleAnswer {
     private TestQuestion question;
 
     @Column(nullable = false)
-    private int answerNumber;
+    private int number;
 
     @Column(nullable = false)
     private int value;

@@ -7,8 +7,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TestRepository extends JpaRepository<Test, Long> {
 
-    boolean existsById(Long id);
-
     boolean existsByName(String name);
 
 }

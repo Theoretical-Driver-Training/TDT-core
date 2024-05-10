@@ -2,8 +2,7 @@ package com.example.api.service.initialize;
 
 import com.example.api.model.test.*;
 import com.example.api.service.test.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -12,9 +11,8 @@ import java.util.Arrays;
 import java.util.List;
 
 @Component
+@Slf4j
 public class EQTestInitializer implements CommandLineRunner {
-
-    private final Logger logger = LoggerFactory.getLogger(EQTestInitializer.class);
 
     private static final String NAME = "EQ";
 
@@ -45,13 +43,13 @@ public class EQTestInitializer implements CommandLineRunner {
     }
 
     private void initializeTestData() {
-        logger.info("Initializing test data...");
+        log.info("Initializing test data...");
         if (testService.existsByName(NAME)) {
-            logger.error("Test already exists!");
+            log.error("Test already exists!");
             return;
         }
 
-        logger.info("Creating test data...");
+        log.info("Creating test data...");
         Test newTest = new Test();
         newTest.setName(NAME);
         newTest.setDescription(DESCRIPTION);
@@ -60,12 +58,12 @@ public class EQTestInitializer implements CommandLineRunner {
         createQuestion(newTest);
         createResult(newTest);
 
-        logger.info("Initializing test data successful");
+        log.info("Initializing test data successful");
     }
 
 
     private void createQuestion(Test newTest) {
-        logger.info("Creating questions : {}", newTest.getName());
+        log.info("Creating questions : {}", newTest.getName());
 
         createQuestion(newTest, 1, First, "Я часто хандрю и пребываю в мрачном настроении без видимой причины");
         createQuestion(newTest, 2, Second, "Я умею «отпускать вожжи» и не пытаюсь всегда и все контролировать в моей жизни");
@@ -120,7 +118,7 @@ public class EQTestInitializer implements CommandLineRunner {
     }
 
     private void createResult(Test newTest) {
-        logger.info("Creating possible results : {}", newTest.getName());
+        log.info("Creating possible results : {}", newTest.getName());
 
 
         TestResult generalEQ = createResult(newTest, EQResults.GENERAL_EQ);
@@ -218,7 +216,7 @@ public class EQTestInitializer implements CommandLineRunner {
     private void createQuestion(Test test, Integer questionNumber, List<Integer> values, String content) {
         TestQuestion newQuestion = new TestQuestion();
         newQuestion.setTest(test);
-        newQuestion.setQuestionNumber(questionNumber);
+        newQuestion.setNumber(questionNumber);
         newQuestion.setContent(content);
         questionService.save(newQuestion);
 
@@ -231,7 +229,7 @@ public class EQTestInitializer implements CommandLineRunner {
     private void createPossibleAnswer(TestQuestion question, Integer answerNumber, Integer value, String content) {
         PossibleAnswer newPossibleAnswer = new PossibleAnswer();
         newPossibleAnswer.setQuestion(question);
-        newPossibleAnswer.setAnswerNumber(answerNumber);
+        newPossibleAnswer.setNumber(answerNumber);
         newPossibleAnswer.setValue(value);
         newPossibleAnswer.setContent(content);
         possibleAnswerService.savePossibleAnswer(newPossibleAnswer);

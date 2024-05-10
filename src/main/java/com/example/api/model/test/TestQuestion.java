@@ -24,7 +24,7 @@ public class TestQuestion {
     private Test test;
 
     @Column(nullable = false)
-    private int questionNumber;
+    private int number;
 
     @Column(nullable = false)
     private String content;

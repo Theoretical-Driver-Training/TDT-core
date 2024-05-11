@@ -20,7 +20,7 @@ public class TestController {
     @Autowired
     private UserAuthenticationService userAuthenticationService;
 
-    @GetMapping("/tests/")
+    @GetMapping("/tests")
     public ResponseEntity<?> getAllTests(@RequestHeader("Authorization") String bearerToken) {
         log.info("Get all tests");
         ResponseEntity<?> responseEntity = userAuthenticationService.validateUserAuthenticationBearerToken(bearerToken);
@@ -43,12 +43,10 @@ public class TestController {
     public ResponseEntity<?> getQuestionByTestId(@RequestHeader("Authorization") String bearerToken,
                                                  @PathVariable Long testId,
                                                  @PathVariable Integer questionNumber) {
-        log.info("Get question by id: {}", testId);
+        log.info("Get question by test id: {} and question number: {}", testId, questionNumber);
         ResponseEntity<?> responseEntity = userAuthenticationService.validateUserAuthenticationBearerToken(bearerToken);
         if (responseEntity.getStatusCode().isError()) return responseEntity;
 
         return ResponseEntity.ok().body(testManagementService.getQuestion(testId, questionNumber));
     }
-
-
 }

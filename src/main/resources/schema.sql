@@ -16,9 +16,10 @@ CREATE TABLE IF NOT EXISTS users
 
 CREATE TABLE IF NOT EXISTS tokens
 (
-    id       BIGSERIAL PRIMARY KEY,
-    username VARCHAR(255) UNIQUE NOT NULL,
-    token    VARCHAR(255)        NOT NULL
+    id          BIGSERIAL PRIMARY KEY,
+    username    VARCHAR(255) UNIQUE NOT NULL,
+    token       VARCHAR(255)        NOT NULL,
+    expiry_date TIMESTAMP           NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS password_change_tokens

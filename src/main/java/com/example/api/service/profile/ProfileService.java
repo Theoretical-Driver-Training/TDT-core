@@ -28,16 +28,8 @@ public class ProfileService {
     public ResponseEntity<?> updateProfileByUser(String bearerToken, String firstName, String lastName,
                                                  String middleName, double weight, double height, Date birthDate) {
         log.info("Updating profile by user");
-        if (tokenService.isValidBearerToken(bearerToken)) {
-            log.error("Bearer token expired {}", bearerToken);
-            return ResponseEntity.badRequest().body("Bearer token expired");
-        }
-
-        String token = tokenService.extractBearerToken(bearerToken);
-        if (jwtUtils.isTokenInBlacklist(token)) {
-            log.error("User token is in list of blacklist");
-            return ResponseEntity.badRequest().body("User token is in list of blacklist");
-        }
+        String token = tokenService.validateAndExtractToken(bearerToken);
+        if (token == null) return ResponseEntity.badRequest().body("Invalid token");
 
         String username = jwtUtils.getUserNameFromJwtToken(token);
         log.info("Update user profile {}", username);
@@ -55,16 +47,8 @@ public class ProfileService {
 
     public ResponseEntity<?> getProfile(String bearerToken) {
         log.info("Getting profile");
-        if (tokenService.isValidBearerToken(bearerToken)) {
-            log.error("Bearer token expired {}", bearerToken);
-            return ResponseEntity.badRequest().body("Bearer token expired");
-        }
-
-        String token = tokenService.extractBearerToken(bearerToken);
-        if (jwtUtils.isTokenInBlacklist(token)) {
-            log.error("User token is in list of blacklist");
-            return ResponseEntity.badRequest().body("User token is in list of blacklist");
-        }
+        String token = tokenService.validateAndExtractToken(bearerToken);
+        if (token == null) return ResponseEntity.badRequest().body("Invalid token");
 
         String username = jwtUtils.getUserNameFromJwtToken(token);
         User user = userDetailsService.getUserEntityByUsername(username);

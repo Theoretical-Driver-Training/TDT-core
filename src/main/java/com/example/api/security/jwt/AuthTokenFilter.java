@@ -1,5 +1,6 @@
 package com.example.api.security.jwt;
 
+import com.example.api.service.token.TokenService;
 import com.example.api.service.user.UserDetailsServiceImpl;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -22,6 +23,9 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     private static final Logger logger = LoggerFactory.getLogger(AuthTokenFilter.class);
 
     @Autowired
+    private TokenService tokenService;
+
+    @Autowired
     private JwtUtils jwtUtils;
 
     @Autowired
@@ -32,7 +36,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         try {
             String jwt = parseJwt(request);
-            if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
+            if (jwt != null && jwtUtils.validateJwtToken(jwt) && !tokenService.isTokenInBlacklist(jwt)) {
                 authenticateUser(request, jwt);
             }
         } catch (Exception e) {

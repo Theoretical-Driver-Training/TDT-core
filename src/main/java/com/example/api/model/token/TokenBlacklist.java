@@ -12,7 +12,7 @@ import java.util.Date;
 @Data
 @NoArgsConstructor
 @Entity
-public class BlacklistToken {
+public class TokenBlacklist {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,7 +22,7 @@ public class BlacklistToken {
 
     private Date expiryDate;
 
-    public BlacklistToken(String token, Date expiryDate) {
+    public TokenBlacklist(String token, Date expiryDate) {
         this.token = token;
         this.expiryDate = expiryDate;
     }

@@ -2,7 +2,6 @@ package com.example.api.service.user;
 
 import com.example.api.payload.response.AuthResponse;
 import com.example.api.security.jwt.JwtUtils;
-import com.example.api.service.token.BlacklistTokenService;
 import com.example.api.service.token.TokenService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,9 +19,6 @@ public class UserAuthenticationService {
 
     @Autowired
     private TokenService tokenService;
-
-    @Autowired
-    private BlacklistTokenService blacklistTokenService;
 
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
@@ -43,12 +39,15 @@ public class UserAuthenticationService {
 
         Authentication authentication = authenticate(username, password);
         String token = jwtUtils.generateJwtToken(authentication);
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
         tokenService.storeToken(username, token);
 
+        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+        AuthResponse response = new AuthResponse(token, userDetails.getUsername(), userDetails.getAuthorities());
+
         log.info("User {} authenticated successfully", username);
-        return ResponseEntity.ok().body(new AuthResponse(token, userDetails.getUsername(), userDetails.getAuthorities()));
+        return ResponseEntity.ok().body(response);
+
     }
 
     private Authentication authenticate(String username, String password) {
@@ -58,13 +57,10 @@ public class UserAuthenticationService {
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> logoutUser(String bearerToken) {
         log.info("Logout user {}", bearerToken);
+        String token = tokenService.validateAndExtractToken(bearerToken);
+        if (token == null) return ResponseEntity.badRequest().body("Invalid token");
 
-        String token = validateAndExtractToken(bearerToken);
-        if (token == null) {
-            return ResponseEntity.badRequest().body("Invalid token");
-        }
-
-        blacklistTokenService.saveToken(token);
+        tokenService.addTokenToBlacklist(token);
         SecurityContextHolder.clearContext();
 
         log.info("User {} logged out successfully", bearerToken);
@@ -72,14 +68,10 @@ public class UserAuthenticationService {
     }
 
     public ResponseEntity<?> validateUserAuthenticationBearerToken(String bearerToken) {
-        String token = validateAndExtractToken(bearerToken);
-        if (token == null) {
-            String errorMsg = "Bearer token is invalid";
-            log.error(errorMsg);
-            return ResponseEntity.badRequest().body(errorMsg);
-        }
+        String token = tokenService.validateAndExtractToken(bearerToken);
+        if (token == null) return ResponseEntity.badRequest().body("Invalid token");
 
-        String username = getUsernameFromJwtToken(token);
+        String username = jwtUtils.getUserNameFromJwtToken(token);
         UserDetailsImpl userDetails = getUserDetailsFromSecurityContext();
 
         if (!userDetails.getUsername().equals(username)) {
@@ -89,25 +81,6 @@ public class UserAuthenticationService {
         }
 
         return ResponseEntity.ok().build();
-    }
-
-    private String validateAndExtractToken(String bearerToken) {
-        if (bearerToken == null || !tokenService.isValidBearerToken(bearerToken)) {
-            log.warn("Invalid or null bearer token");
-            return null;
-        }
-
-        String token = tokenService.extractBearerToken(bearerToken);
-        if (tokenService.isTokenIsBlacklist(token)) {
-            log.warn("Token is blacklisted: {}", token);
-            return null;
-        }
-
-        return token;
-    }
-
-    private String getUsernameFromJwtToken(String token) {
-        return tokenService.getUserNameFromJwtToken(token);
     }
 
     public UserDetailsImpl getUserDetailsFromSecurityContext() {

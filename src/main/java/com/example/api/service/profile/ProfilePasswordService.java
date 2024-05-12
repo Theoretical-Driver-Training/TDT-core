@@ -4,8 +4,8 @@ import com.example.api.model.token.PasswordChangeToken;
 import com.example.api.model.user.User;
 import com.example.api.payload.response.PasswordChangeResponse;
 import com.example.api.payload.response.PasswordForgotResponse;
+import com.example.api.security.jwt.JwtUtils;
 import com.example.api.service.mail.MailService;
-import com.example.api.service.token.BlacklistTokenService;
 import com.example.api.service.token.PasswordChangeTokenService;
 import com.example.api.service.token.TokenService;
 import com.example.api.service.user.UserDetailsServiceImpl;
@@ -30,23 +30,17 @@ public class ProfilePasswordService {
     private PasswordChangeTokenService passwordChangeTokenService;
 
     @Autowired
-    private BlacklistTokenService blacklistTokenService;
+    private MailService mailService;
 
     @Autowired
-    private MailService mailService;
+    private JwtUtils jwtUtils;
 
     public ResponseEntity<?> resetPassword(String bearerToken) {
         log.info("Change password request received");
-        if (!tokenService.isValidBearerToken(bearerToken)) {
-            return ResponseEntity.badRequest().body("Invalid bearer token");
-        }
+        String token = tokenService.validateAndExtractToken(bearerToken);
+        if (token == null) return ResponseEntity.badRequest().body("Invalid token");
 
-        String token = tokenService.extractBearerToken(bearerToken);
-        if (tokenService.isTokenIsBlacklist(token)) {
-            return ResponseEntity.badRequest().body("Token is blacklist");
-        }
-
-        String username = tokenService.getUserNameFromJwtToken(token);
+        String username = jwtUtils.getUserNameFromJwtToken(token);
         User user = userDetailsService.getUserEntityByUsername(username);
 
         PasswordChangeToken passwordChangeToken = passwordChangeTokenService.getOnCreateChangePasswordToken(user);
@@ -65,7 +59,7 @@ public class ProfilePasswordService {
         }
 
         String token = passwordChangeTokenService.extractChangeToken(changeToken);
-        if (tokenService.isTokenIsBlacklist(token)) {
+        if (tokenService.isTokenInBlacklist(token)) {
             return ResponseEntity.badRequest().body("Token is blacklist");
         }
 
@@ -81,7 +75,7 @@ public class ProfilePasswordService {
 
         userDetailsService.updatePassword(user, newPassword);
 
-        blacklistTokenService.saveToken(token);
+        tokenService.addTokenToBlacklist(token);
 
         log.info("Password changed successfully");
         return ResponseEntity.ok().body("Password changed successfully");

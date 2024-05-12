@@ -1,7 +1,7 @@
 package com.example.api.service.initialize;
 
 import com.example.api.model.test.*;
-import com.example.api.service.test.*;
+import com.example.api.service.TestManagementService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -23,19 +23,7 @@ public class EQTestInitializer implements CommandLineRunner {
     private static final List<Integer> Second = Arrays.asList(4, 3, 2, 1);
 
     @Autowired
-    private TestService testService;
-
-    @Autowired
-    private TestQuestionService questionService;
-
-    @Autowired
-    private PossibleAnswerService possibleAnswerService;
-
-    @Autowired
-    private PossibleResultService possibleResultsService;
-
-    @Autowired
-    private TestResultService testResultService;
+    private TestManagementService testManagementService;
 
     @Override
     public void run(String... args) {
@@ -44,7 +32,7 @@ public class EQTestInitializer implements CommandLineRunner {
 
     private void initializeTestData() {
         log.info("Initializing test data...");
-        if (testService.existsByName(NAME)) {
+        if (testManagementService.existTestByName(NAME)) {
             log.error("Test already exists!");
             return;
         }
@@ -53,7 +41,7 @@ public class EQTestInitializer implements CommandLineRunner {
         Test newTest = new Test();
         newTest.setName(NAME);
         newTest.setDescription(DESCRIPTION);
-        testService.save(newTest);
+        testManagementService.saveTest(newTest);
 
         createQuestion(newTest);
         createResult(newTest);
@@ -218,7 +206,7 @@ public class EQTestInitializer implements CommandLineRunner {
         newQuestion.setTest(test);
         newQuestion.setNumber(questionNumber);
         newQuestion.setContent(content);
-        questionService.save(newQuestion);
+        testManagementService.saveQuestion(newQuestion);
 
         createPossibleAnswer(newQuestion, 1, values.get(0), EQAnswer.CORRECT.name());
         createPossibleAnswer(newQuestion, 2, values.get(1), EQAnswer.MOSTLY_CORRECT.name());
@@ -232,7 +220,7 @@ public class EQTestInitializer implements CommandLineRunner {
         newPossibleAnswer.setNumber(answerNumber);
         newPossibleAnswer.setValue(value);
         newPossibleAnswer.setContent(content);
-        possibleAnswerService.savePossibleAnswer(newPossibleAnswer);
+        testManagementService.savePossibleAnswer(newPossibleAnswer);
     }
 
     private TestResult createResult(Test test, EQResults eqResults) {
@@ -240,7 +228,7 @@ public class EQTestInitializer implements CommandLineRunner {
         newResult.setTest(test);
         newResult.setName(eqResults.getName());
         newResult.setDescription(eqResults.getDescription());
-        testResultService.save(newResult);
+        testManagementService.saveResult(newResult);
         return newResult;
     }
 
@@ -250,6 +238,6 @@ public class EQTestInitializer implements CommandLineRunner {
         newPossibleResults.setStartValue(startValue);
         newPossibleResults.setEndValue(endValue);
         newPossibleResults.setContent(content);
-        possibleResultsService.save(newPossibleResults);
+        testManagementService.savePossibleResult(newPossibleResults);
     }
 }

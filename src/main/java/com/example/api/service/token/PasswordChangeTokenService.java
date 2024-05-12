@@ -1,6 +1,6 @@
 package com.example.api.service.token;
 
-import com.example.api.model.token.PasswordChangeToken;
+import com.example.api.model.token.TokenChangePassword;
 import com.example.api.model.user.User;
 import com.example.api.repository.token.ChangePasswordTokenRepository;
 import org.slf4j.Logger;
@@ -24,15 +24,15 @@ public class PasswordChangeTokenService {
     @Autowired
     private ChangePasswordTokenRepository repository;
 
-    public PasswordChangeToken getOnCreateChangePasswordToken(User user) {
+    public TokenChangePassword getOnCreateChangePasswordToken(User user) {
         return repository.findByUser(user)
                 .map(this::updateExistingToken)
                 .orElseGet(() -> createNewChangePasswordToken(user));
     }
 
-    private PasswordChangeToken createNewChangePasswordToken(User user) {
+    private TokenChangePassword createNewChangePasswordToken(User user) {
         logger.info("Creating new password change token");
-        PasswordChangeToken changePasswordToken = new PasswordChangeToken();
+        TokenChangePassword changePasswordToken = new TokenChangePassword();
         changePasswordToken.setUser(user);
         changePasswordToken.setExpiryDate(new Date(System.currentTimeMillis() + EXPIRATION));
         changePasswordToken.setToken(generateUniqueToken());
@@ -40,7 +40,7 @@ public class PasswordChangeTokenService {
         return repository.save(changePasswordToken);
     }
 
-    private PasswordChangeToken updateExistingToken(PasswordChangeToken token) {
+    private TokenChangePassword updateExistingToken(TokenChangePassword token) {
         logger.info("Updating existing password change token");
         token.setToken(generateUniqueToken());
         token.setExpiryDate(new Date(System.currentTimeMillis() + EXPIRATION));
@@ -49,7 +49,7 @@ public class PasswordChangeTokenService {
         return token;
     }
 
-    public Optional<PasswordChangeToken> getByToken(String token) {
+    public Optional<TokenChangePassword> getByToken(String token) {
         logger.info("Retrieving password change token");
         return repository.findByToken(token);
     }

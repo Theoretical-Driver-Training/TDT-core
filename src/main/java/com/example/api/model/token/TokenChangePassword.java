@@ -10,7 +10,7 @@ import java.util.Date;
 @Data
 @NoArgsConstructor
 @Entity
-public class PasswordChangeToken {
+public class TokenChangePassword {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,9 +24,4 @@ public class PasswordChangeToken {
     @JoinColumn(nullable = false, name = "user_id")
     private User user;
 
-    public PasswordChangeToken(String token, Date expiryDate, User user) {
-        this.token = token;
-        this.expiryDate = expiryDate;
-        this.user = user;
-    }
 }

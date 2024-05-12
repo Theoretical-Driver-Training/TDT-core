@@ -1,12 +1,12 @@
 package com.example.api.payload.response;
 
-import com.example.api.model.token.PasswordChangeToken;
+import com.example.api.model.token.TokenChangePassword;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class PasswordChangeResponse {
+public class ChangePasswordResponse {
 
     String confirmationLink;
 
@@ -14,7 +14,7 @@ public class PasswordChangeResponse {
 
     String content;
 
-    public PasswordChangeResponse(PasswordChangeToken changeToken) {
+    public ChangePasswordResponse(TokenChangePassword changeToken) {
         confirmationLink = "https://localhost:8080/api/profile/change_password?token=" + changeToken.getToken();
 
         subject = "Изменение пароля";

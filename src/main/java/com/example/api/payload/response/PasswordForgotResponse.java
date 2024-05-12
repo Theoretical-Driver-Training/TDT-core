@@ -1,6 +1,6 @@
 package com.example.api.payload.response;
 
-import com.example.api.model.token.PasswordChangeToken;
+import com.example.api.model.token.TokenChangePassword;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -12,7 +12,7 @@ public class PasswordForgotResponse {
     private String subject;
     private String content;
 
-    public PasswordForgotResponse(PasswordChangeToken resetToken) {
+    public PasswordForgotResponse(TokenChangePassword resetToken) {
         activationLink = "https://localhost:8080/api/profile/forgot_password?token=" + resetToken.getToken();
 
         subject = "Активация нового пароля";

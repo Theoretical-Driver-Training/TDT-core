@@ -1,13 +1,13 @@
 package com.example.api.service.profile;
 
-import com.example.api.model.token.PasswordChangeToken;
+import com.example.api.model.token.TokenChangePassword;
 import com.example.api.model.user.User;
-import com.example.api.payload.response.PasswordChangeResponse;
+import com.example.api.payload.response.ChangePasswordResponse;
 import com.example.api.payload.response.PasswordForgotResponse;
-import com.example.api.security.jwt.JwtUtils;
 import com.example.api.service.mail.MailService;
 import com.example.api.service.token.PasswordChangeTokenService;
 import com.example.api.service.token.TokenService;
+import com.example.api.service.user.UserAuthenticationService;
 import com.example.api.service.user.UserDetailsServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,20 +33,19 @@ public class ProfilePasswordService {
     private MailService mailService;
 
     @Autowired
-    private JwtUtils jwtUtils;
+    private UserAuthenticationService userAuthenticationService;
 
     public ResponseEntity<?> resetPassword(String bearerToken) {
         log.info("Change password request received");
         String token = tokenService.validateAndExtractToken(bearerToken);
         if (token == null) return ResponseEntity.badRequest().body("Invalid token");
 
-        String username = jwtUtils.getUserNameFromJwtToken(token);
-        User user = userDetailsService.getUserEntityByUsername(username);
+        User user = userAuthenticationService.getUserDetailsFromSecurityContext().getUser();
 
-        PasswordChangeToken passwordChangeToken = passwordChangeTokenService.getOnCreateChangePasswordToken(user);
-        PasswordChangeResponse passwordChangeResponse = new PasswordChangeResponse(passwordChangeToken);
+        TokenChangePassword tokenChangePassword = passwordChangeTokenService.getOnCreateChangePasswordToken(user);
+        ChangePasswordResponse changePasswordResponse = new ChangePasswordResponse(tokenChangePassword);
 
-        mailService.sendMail(user.getUsername(), passwordChangeResponse.getSubject(), passwordChangeResponse.getContent());
+        mailService.sendMail(user.getUsername(), changePasswordResponse.getSubject(), changePasswordResponse.getContent());
 
         log.info("Password change request completed");
         return ResponseEntity.ok().body("Password change request completed");
@@ -63,7 +62,7 @@ public class ProfilePasswordService {
             return ResponseEntity.badRequest().body("Token is blacklist");
         }
 
-        Optional<PasswordChangeToken> changeTokenOptional = passwordChangeTokenService.getByToken(token);
+        Optional<TokenChangePassword> changeTokenOptional = passwordChangeTokenService.getByToken(token);
 
         User user = changeTokenOptional.get().getUser();
         if (!userDetailsService.isValidOldPassword(user, oldPassword)) {
@@ -85,7 +84,7 @@ public class ProfilePasswordService {
         log.info("Forgot password request received");
         User user = userDetailsService.getUserEntityByUsername(username);
 
-        PasswordChangeToken passwordChangeToken = passwordChangeTokenService.getOnCreateChangePasswordToken(user);
+        TokenChangePassword passwordChangeToken = passwordChangeTokenService.getOnCreateChangePasswordToken(user);
         PasswordForgotResponse passwordForgotResponse = new PasswordForgotResponse(passwordChangeToken);
 
         mailService.sendMail(user.getUsername(), passwordForgotResponse.getSubject(), passwordForgotResponse.getContent());

@@ -1,9 +1,6 @@
 package com.example.api.service;
 
 import com.example.api.model.test.*;
-import com.example.api.payload.response.PossibleAnswerResponse;
-import com.example.api.payload.response.QuestionResponse;
-import com.example.api.payload.response.TestResponse;
 import com.example.api.repository.test.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +8,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Slf4j
@@ -32,90 +28,94 @@ public class TestManagementService {
     @Autowired
     private PossibleResultRepository possibleResultRepository;
 
+    @Autowired
+    private TestHistoryManagementService testHistoryManagementService;
+
     @Transactional(readOnly = true)
-    public List<TestResponse> getTests() {
+    public List<Test> getTests() {
         log.info("Requesting tests");
-        return testRepository.findAll().stream()
-                .map(this::convertTestToTestResponse)
-                .toList();
+        return testRepository.findAll();
     }
 
     @Transactional(readOnly = true)
-    public TestResponse getTest(Long testId) {
-        log.info("Requesting test {}", testId);
+    public Test getTest(Long testId) {
+        log.info("Requesting test by id {}", testId);
         return testRepository.findById(testId)
-                .map(this::convertTestToTestResponse)
                 .orElse(null);
     }
 
-    @Transactional(readOnly = true)
-    public QuestionResponse getQuestion(Long testId, Integer questionNumber) {
-        log.info("Requesting question {}", testId);
+    public TestQuestion getQuestion(Long testId, Integer questionNumber) {
+        log.info("Requesting question by id {} with number {}", testId, questionNumber);
         return testRepository.findById(testId)
-                .flatMap(test -> extractQuestionFromTestByQuestionNumber(test, questionNumber))
-                .map(this::convertAnswerToTestQuestionResponse)
+                .map(test -> extractQuestion(test, questionNumber))
                 .orElse(null);
     }
 
+    public void setAnswerToQuestion(Long testId, Integer questionNumber, Integer answerNumber) {
+        log.info("Setting answer to question with number {}", questionNumber);
+        TestQuestion question = getQuestion(testId, questionNumber);
+        PossibleAnswer possibleAnswer = getPossibleAnswer(testId, questionNumber, answerNumber);
+        testHistoryManagementService.addTestHistoryAnswer(testId, question, possibleAnswer);
+    }
+
     @Transactional(readOnly = true)
-    public boolean existTestByName(String name) {
-        log.info("Requesting existing test {}", name);
+    public boolean existTest(String name) {
+        log.info("Request to check if test exists with name {}", name);
         return testRepository.existsByName(name);
     }
 
     @Transactional
-    public void saveTest(Test test) {
+    public void save(Test test) {
         log.info("Saving test {}", test);
         testRepository.save(test);
     }
 
     @Transactional
-    public void saveQuestion(TestQuestion testQuestion) {
-        log.info("Saving question {}", testQuestion);
-        questionRepository.save(testQuestion);
+    public void save(TestQuestion question) {
+        log.info("Saving question {}", question);
+        questionRepository.save(question);
     }
 
     @Transactional
-    public void saveResult(TestResult testResult) {
-        log.info("Saving result {}", testResult);
-        resultRepository.save(testResult);
+    public void save(TestResult result) {
+        log.info("Saving result {}", result);
+        resultRepository.save(result);
     }
 
     @Transactional
-    public void savePossibleAnswer(PossibleAnswer possibleAnswer) {
-        log.info("Saving possible answer {}", possibleAnswer);
-        possibleAnswerRepository.save(possibleAnswer);
+    public void save(PossibleAnswer answer) {
+        log.info("Saving possible answer {}", answer);
+        possibleAnswerRepository.save(answer);
     }
 
     @Transactional
-    public void savePossibleResult(PossibleResult possibleResult) {
-        log.info("Saving possible result {}", possibleResult);
-        possibleResultRepository.save(possibleResult);
+    public void save(PossibleResult result) {
+        log.info("Saving possible result {}", result);
+        possibleResultRepository.save(result);
     }
 
-    private TestResponse convertTestToTestResponse(Test test) {
-        log.debug("Converting test to response {}", test);
-        return new TestResponse(test.getId(), test.getName(), test.getDescription(), test.getQuestions().size());
+    private PossibleAnswer getPossibleAnswer(Long testId, Integer questionNumber, Integer answerNumber) {
+        log.debug("Requesting possible answer with number {}", answerNumber);
+        return testRepository.findById(testId)
+                .map(test -> extractQuestion(test, questionNumber))
+                .map(question -> extractPossibleAnswer(question, answerNumber))
+                .orElse(null);
     }
 
-    private Optional<TestQuestion> extractQuestionFromTestByQuestionNumber(Test test, Integer questionNumber) {
-        log.debug("Extracting question {}", questionNumber);
+    private TestQuestion extractQuestion(Test test, Integer questionNumber) {
+        log.debug("Extracting question with number {}", questionNumber);
         return test.getQuestions().stream()
                 .filter(question -> question.getNumber() == questionNumber)
-                .findFirst();
+                .findFirst()
+                .orElse(null);
     }
 
-    private QuestionResponse convertAnswerToTestQuestionResponse(TestQuestion testQuestion) {
-        log.debug("Converting answer to response {}", testQuestion);
-        return new QuestionResponse(testQuestion.getNumber(), testQuestion.getContent(),
-                testQuestion.getPossibleAnswers().stream()
-                        .map(this::convertPossibleAnswerToTestPossibleAnswerResponse)
-                        .toList());
-    }
-
-    private PossibleAnswerResponse convertPossibleAnswerToTestPossibleAnswerResponse(PossibleAnswer possibleAnswer) {
-        log.debug("Converting possible answer to response {}", possibleAnswer);
-        return new PossibleAnswerResponse(possibleAnswer.getNumber(), possibleAnswer.getContent());
+    private PossibleAnswer extractPossibleAnswer(TestQuestion question, Integer answerNumber) {
+        log.debug("Extracting possible answer from question {}", question);
+        return question.getPossibleAnswers().stream()
+                .filter(answer -> answer.getNumber() == answerNumber)
+                .findFirst()
+                .orElse(null);
     }
 }
 

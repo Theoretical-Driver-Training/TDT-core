@@ -12,6 +12,10 @@ public interface TestHistoryRepository extends JpaRepository<TestHistory, Long> 
 
     Optional<TestHistory> findTestHistoryById(Long testHistoryId);
 
+    Optional<TestHistory> findTestHistoryByTestId(Long testId);
+
+    Optional<TestHistory> findTestHistoryByUserIdAndTestId(Long userId, Long testId);
+
     List<TestHistory> findTestHistoriesByUserId(Long userId);
 
 }
